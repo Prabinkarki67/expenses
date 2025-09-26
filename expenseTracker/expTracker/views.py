@@ -20,12 +20,12 @@ def home(request):
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():  # <-- add ()
             user = form.save()
             login(request, user)
             return redirect('home')
-        else:
-            form = UserCreationForm()
-        return render(request, 'registration/register.html', {
-            'form :form'
-        })
+    else:
+        form = UserCreationForm()
+
+    # Always return a response
+    return render(request, 'registration/register.html', {'form': form})
