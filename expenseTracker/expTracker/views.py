@@ -8,6 +8,7 @@ from .models import Accounts, Expense
 from django.views.generic import TemplateView
 from django.views.generic import ListView
 from datetime import datetime
+from django.contrib.auth.forms import AuthenticationForm
 
 
 # Create your views here.
@@ -29,3 +30,19 @@ def register(request):
 
     # Always return a response
     return render(request, 'registration/register.html', {'form': form})
+
+def login(request):
+    if request.method == 'POST':
+        form  = AuthenticationForm(request, data = request.POST)
+    if form.is_valid():
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user  = authenticate(username = username, password = password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    return render(request, "login.html", {"form": form})
+       
+        
