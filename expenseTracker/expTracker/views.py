@@ -9,6 +9,14 @@ from django.views.generic import TemplateView, FormView
 from django.views.generic import ListView
 from datetime import datetime
 from django.contrib.auth.forms import AuthenticationForm
+from dateutil.relativedelta import relativedelta
+from django.utils.safestring import mark_safe
+from django.db.models import Sum, Count, F
+from .forms import ExpenseForm
+import plotly.express as px
+from plotly.graph_objs import *
+
+
 
 
 # Create your views here.
@@ -72,5 +80,23 @@ class ExpenseListView(FormView):
         user = self.request.user
         accounts = Accounts.objects.filter( user = user)
         
-       
         
+        expense_data_graph = {}
+        expense_data = {}
+        
+        for account in accounts:
+            expenses = account.expense_list.all()
+            for expense in expenses:
+                if expense.long_term and expense.monthly_expenses:
+                    current_date = expense.date
+                    while current_date <= expense.end_date:
+                        year_month = current_date.strftime('%Y-%m')
+                        if year_month not in expense_data_graph:
+                            expense_data_graph[year_month] = []
+                            
+                            expense_data_graph[year_month].append({
+                                'name': expense.name,
+                                'amount': expense.monthly_expense,
+                                'date': expense.date,
+                                'end_date':expense.end_date
+                            })
