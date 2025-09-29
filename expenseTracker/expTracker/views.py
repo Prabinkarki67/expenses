@@ -100,3 +100,10 @@ class ExpenseListView(FormView):
                                 'date': expense.date,
                                 'end_date':expense.end_date
                             })
+                            current_date = current_date + relativedelta(months=1)
+                        else:
+                            year_month = expense.date.strftime('%Y-%m')
+                            if year_month not in expense_data_graph:
+                                expense_date_graph[year_month] = []
+                                
+                            expense_data_graph[year_month].append({})
